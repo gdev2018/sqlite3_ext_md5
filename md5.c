@@ -200,8 +200,7 @@ static void MD5Init(MD5Context *pCtx){
  * Update context to reflect the concatenation of another buffer full
  * of bytes.
  */
-static
-void MD5Update(MD5Context *pCtx, const unsigned char *buf, unsigned int len){
+static void MD5Update(MD5Context *pCtx, const unsigned char *buf, unsigned int len){
     struct Context2 *ctx = (struct Context2 *)pCtx;
     uint32 t;
 
@@ -341,7 +340,12 @@ static void md5(sqlite3_context *context, int argc, sqlite3_value **argv){
     MD5Final(digest,&ctx);
     sqlite3_result_blob(context, digest, sizeof(digest), SQLITE_TRANSIENT);
 }
-//
+
+int md5test(int value)
+{
+    return value + 255;
+}
+
 //static char md5direct(const char str)
 //{
 //    int argc = 10;
@@ -349,30 +353,24 @@ static void md5(sqlite3_context *context, int argc, sqlite3_value **argv){
 //    **argv = (sqlite3_value**)str;
 //    return md5direct2(argc, argv);
 //}
-//static unsigned char md5direct2(int argc, sqlite3_value **argv)
-//{
-//    MD5Context ctx;
-//    unsigned char digest[16];
-//    int i;
-//
-//    if( argc<1 ) return (unsigned char)digest;
-//
-//    if( sqlite3_value_type(argv[0]) == SQLITE_NULL ){
-////        sqlite3_result_null(context);
-//        return (unsigned char)digest;
-//    }
-//    MD5Init(&ctx);
-//
-//    for(i=0; i<argc; i++){
-//        const char *zData = (char*)sqlite3_value_blob(argv[i]);
-//        if( zData ){
-//            MD5Update(&ctx, (unsigned char*)zData, sqlite3_value_bytes(argv[i]));
-//        }
-//    }
-//    MD5Final(digest,&ctx);
-//
-//    return (unsigned char)digest;
-//}
+unsigned char md5direct(int argc, sqlite3_value **argv[]){
+    MD5Context ctx;
+    unsigned char digest[16];
+    int i;
+
+
+    MD5Init(&ctx);
+//  MD5Update(&ctx, (unsigned char*)sqlite3_value_blob(argv[0]), sqlite3_value_bytes(argv[0]));
+    for(i=0; i<argc; i++){
+        const char *zData = (char*)sqlite3_value_blob(argv[i]);
+        if( zData ){
+            MD5Update(&ctx, (unsigned char*)zData, sqlite3_value_bytes(argv[i]));
+        }
+    }
+    MD5Final(digest,&ctx);
+
+    return digest;
+}
 
 // Returns the md5 hash of an UTF-16 representation of a string
 static void md5_utf16(sqlite3_context *context, int argc, sqlite3_value **argv) {
@@ -460,4 +458,3 @@ int sqlite3_extension_init(
 
 
 #endif
-

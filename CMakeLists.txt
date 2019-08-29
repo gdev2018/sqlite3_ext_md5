@@ -5,13 +5,16 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(.)
 
+#set(SOURCE_FILES
 file(GLOB SOURCE_FILES
-        test.cpp
+#        main_test_sqlite.cpp
+        main_test_md5.cpp
+#        sqlite3.h
+        sqlite3.c
+#        md5.h
         md5.c
-        md5.h
-        md5tcl.c
-        sqlite3.h
-        sqlite3ext.h)
+        #        sqlite3ext.h
+)
 
 add_executable(sqlite3_ext_md5 ${SOURCE_FILES})
 
