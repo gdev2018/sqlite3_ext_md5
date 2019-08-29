@@ -9,6 +9,7 @@ file(GLOB SOURCE_FILES
         test.cpp
         md5.c
         md5.h
+        md5tcl.c
         sqlite3.h
         sqlite3ext.h)
 
