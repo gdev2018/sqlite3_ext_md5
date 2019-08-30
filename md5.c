@@ -345,10 +345,11 @@ static void md5(sqlite3_context *context, int argc, sqlite3_value **argv){
 
 
 
-long long getLongOffset(unsigned char array[], int offset) {
+//long long getLongOffset(unsigned char array[], int offset) {
+long long getLongOffset(const unsigned char *hex, int offset) {
     long long value = 0;
     for (int i = 0; i < 8; i++) {
-        value = ((value << 8) | (array[offset+i] & 0xFF));
+        value = ((value << 8) | (hex[offset+i] & 0xFF));
     }
     return value;
 }
@@ -436,20 +437,19 @@ static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     }
     MD5Final(digest,&ctx);
 
-    char *hex;
-    hex = bin2hex((unsigned char *)digest, strlen((char *)digest));
+    const char *hex;
+    hex = bin2hex(digest, strlen(digest));
     printf("bin2hex(digest): %s\n", hex);
+    printf("strlen(digest): %d\n", strlen(digest));
 
     long long md5long;
-    md5long = (getLongOffset(hex, 0) ^ getLongOffset(hex, 8));
+    md5long = (getLongOffset((unsigned char *)hex, 0) ^ getLongOffset((unsigned char *)hex, 8));
     printf("md5long: %lld\n", md5long);
 
     unsigned char digest_ethalon[] = "1bc29b36f623ba82aaf6724fd3b16718";
     long long md5long_ethalon;
     md5long_ethalon = (getLongOffset(digest_ethalon, 0) ^ getLongOffset(digest_ethalon, 8));
     printf("md5long_ethalon: %lld\n", md5long_ethalon);
-
-    free(hex);
 
     sqlite3_result_int64(context, md5long);
 //    sqlite3_result_blob(context, digest, sizeof(digest), SQLITE_TRANSIENT);

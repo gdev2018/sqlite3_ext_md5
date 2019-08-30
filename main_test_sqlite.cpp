@@ -23,30 +23,42 @@ static int callback(void *data, int argc, char **argv, char **azColName){
 }
 
 int main(int argc, char *argv[]) {
+//    // test getLongOffset by unsigned char
 //    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
 //    long long md5long;
 //    md5long = (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
-////    std::cout << (md5long);
-//    printf("md5long: %lld", md5long);
+//    printf("md5long: %lld\n", md5long);
+//    return 0;
 
-    // test hex2bin
-    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
+    // test getLongOffset by char *a
+//    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
     const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
-    char          *hex;
-    unsigned char *bin;
-    size_t         binlen;
-
-    binlen = hexs2bin(a, &bin);
-    printf("bin = %.*s\n", (int)binlen, (char *)bin);
-
-    printf("binlen = %d\n", binlen);
-
-    hex = bin2hex(bin, binlen);
-    printf("hex = %s\n", hex);
-
-    free(bin);
-    free(hex);
+    long long md5long;
+    md5long = (getLongOffset((unsigned char *)a, 0) ^ getLongOffset((unsigned char *)a, 8));
+    printf("md5long: %lld\n", md5long);
     return 0;
+
+
+
+
+//    // test hex2bin
+//    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
+//    const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
+//    char          *hex;
+//    unsigned char *bin;
+//    size_t         binlen;
+//
+//    binlen = hexs2bin(a, &bin);
+//    printf("bin = %.*s\n", (int)binlen, (char *)bin);
+//
+//    printf("binlen = %d\n", binlen);
+//
+//    hex = bin2hex(bin, binlen);
+//    printf("hex = %s\n", hex);
+//
+//    free(bin);
+//    free(hex);
+//    return 0;
 
 
 //    // test bin2hex
@@ -66,24 +78,6 @@ int main(int argc, char *argv[]) {
 //    return 0;
 
 
-//    char *hex;
-//    hex = bin2hex((unsigned char *)digest, strlen((char *)digest));
-//    printf("bin2hex(digest): %s\n", hex);
-//
-//    long long md5long;
-//    md5long = (getLongOffset(hex, 0) ^ getLongOffset(hex, 8));
-//    printf("md5long: %lld\n", md5long);
-//
-//    unsigned char digest_ethalon[] = "1bc29b36f623ba82aaf6724fd3b16718";
-//    long long md5long_ethalon;
-//    md5long_ethalon = (getLongOffset(digest_ethalon, 0) ^ getLongOffset(digest_ethalon, 8));
-//    printf("md5long_ethalon: %lld\n", md5long_ethalon);
-//
-//    free(hex);
-//
-//
-//
-//
 //    sqlite3 *db;
 //    char *zErrMsg = 0;
 //    int rc;
