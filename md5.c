@@ -364,10 +364,10 @@ char *bin2hex(const unsigned char *bin, size_t len)
 
     out = malloc(len*2+1);
     for (i=0; i<len; i++) {
-//        out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
-//        out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
-        out[i*2]   = "0123456789abcdef"[bin[i] >> 4];
-        out[i*2+1] = "0123456789abcdef"[bin[i] & 0x0F];
+        out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
+        out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+//        out[i*2]   = "0123456789abcdef"[bin[i] >> 4];
+//        out[i*2+1] = "0123456789abcdef"[bin[i] & 0x0F];
     }
     out[len*2] = '\0';
 
@@ -418,6 +418,24 @@ size_t hexs2bin(const char *hex, unsigned char **out)
     return len;
 }
 
+static void hex2long(sqlite3_context *context, int argc, sqlite3_value **argv){
+    unsigned char digest[16];
+    const unsigned char *zIn;
+//    int nIn;
+
+    assert( argc==1 );
+    if( sqlite3_value_type(argv[0])==SQLITE_NULL ) return;
+    zIn = (const unsigned char*)sqlite3_value_text(argv[0]);
+//    nIn = sqlite3_value_bytes(argv[0]);
+
+//    assert( nIn<16 );
+    strcpy(digest, zIn);    // prevent for control size input string <16
+
+    long long md5long;
+    md5long = (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
+
+    sqlite3_result_int64(context, md5long);
+}
 
 static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     MD5Context ctx;
@@ -441,20 +459,13 @@ static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
 
     const char *hex;
     hex = bin2hex(digest, strlen(digest));
-    printf("bin2hex(digest): %s\n", hex);
-    printf("strlen(digest): %d\n", strlen(digest));
+
+    //@todo add lower(hex)
 
     long long md5long;
     md5long = (getLongOffset((unsigned char *)hex, 0) ^ getLongOffset((unsigned char *)hex, 8));
-    printf("md5long: %lld\n", md5long);
-
-    unsigned char digest_ethalon[] = "1bc29b36f623ba82aaf6724fd3b16718";
-    long long md5long_ethalon;
-    md5long_ethalon = (getLongOffset(digest_ethalon, 0) ^ getLongOffset(digest_ethalon, 8));
-    printf("md5long_ethalon: %lld\n", md5long_ethalon);
 
     sqlite3_result_int64(context, md5long);
-//    sqlite3_result_blob(context, digest, sizeof(digest), SQLITE_TRANSIENT);
 }
 
 
@@ -528,6 +539,7 @@ int sqlite3Md5Init(sqlite3 *db){
     sqlite3_create_function(db, "group_md5", -1, SQLITE_UTF8, 0, 0, md5step, md5finalize);
     sqlite3_create_function(db, "md5",      -1, SQLITE_UTF8,  0, md5,     0, 0);
     sqlite3_create_function(db, "md5long",      -1, SQLITE_UTF8,  0, md5long,     0, 0);
+    sqlite3_create_function(db, "hex2long",      -1, SQLITE_UTF8,  0, hex2long,     0, 0);
     sqlite3_create_function(db, "md5_utf16", -1, SQLITE_UTF16, 0, md5_utf16, 0, 0);
     sqlite3_create_function(db, "md5file",   1, SQLITE_UTF8,  0, md5file, 0, 0);
     return 0;
