@@ -354,7 +354,7 @@ long long getLongOffset(const unsigned char *hex, int offset) {
     return value;
 }
 
-char *bin2hex(const unsigned char *bin, size_t len)
+char *bin2hex(const unsigned char *bin, size_t len, int lower)
 {
     char   *out;
     size_t  i;
@@ -364,10 +364,13 @@ char *bin2hex(const unsigned char *bin, size_t len)
 
     out = malloc(len*2+1);
     for (i=0; i<len; i++) {
-        out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
-        out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
-//        out[i*2]   = "0123456789abcdef"[bin[i] >> 4];
-//        out[i*2+1] = "0123456789abcdef"[bin[i] & 0x0F];
+        if (lower == 0) {
+            out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
+            out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+        }else {
+            out[i*2]   = "0123456789abcdef"[bin[i] >> 4];
+            out[i*2+1] = "0123456789abcdef"[bin[i] & 0x0F];
+        }
     }
     out[len*2] = '\0';
 
@@ -458,9 +461,7 @@ static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     MD5Final(digest,&ctx);
 
     const char *hex;
-    hex = bin2hex(digest, strlen(digest));
-
-    //@todo add lower(hex)
+    hex = bin2hex(digest, strlen(digest), 1);
 
     long long md5long;
     md5long = (getLongOffset((unsigned char *)hex, 0) ^ getLongOffset((unsigned char *)hex, 8));
