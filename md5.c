@@ -353,14 +353,27 @@ int md5test(int value)
 //    **argv = (sqlite3_value**)str;
 //    return md5direct2(argc, argv);
 //}
-unsigned char md5direct(int argc, sqlite3_value **argv[]){
+
+long long getLongOffset(unsigned char array[], int offset) {
+    long long value = 0;
+    for (int i = 0; i < 8; i++) {
+        value = ((value << 8) | (array[offset+i] & 0xFF));
+    }
+    return value;
+}
+
+static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     MD5Context ctx;
     unsigned char digest[16];
     int i;
 
-
+    if( argc<1 ) return;
+    if( sqlite3_value_type(argv[0]) == SQLITE_NULL ){
+        sqlite3_result_null(context);
+        return;
+    }
     MD5Init(&ctx);
-//  MD5Update(&ctx, (unsigned char*)sqlite3_value_blob(argv[0]), sqlite3_value_bytes(argv[0]));
+
     for(i=0; i<argc; i++){
         const char *zData = (char*)sqlite3_value_blob(argv[i]);
         if( zData ){
@@ -368,9 +381,76 @@ unsigned char md5direct(int argc, sqlite3_value **argv[]){
         }
     }
     MD5Final(digest,&ctx);
+    printf("digest: %s\n", digest);
 
-    return digest;
+    long long md5long;
+    md5long = (getLongOffset(digest, 0)); // ^ getLongOffset(digest, 8));
+    printf("(getLongOffset(digest, 0)): %d\n", md5long);
+
+    sqlite3_result_int64(context, md5long);
 }
+
+//public static long getLongMD5(final String str) {
+//    try {
+////            System.out.println(MD5(str));
+//        final byte[] digest = MD5(str).getBytes();
+//        return (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
+//    } catch (Exception var2) {
+//        return -1;
+//    }
+//}
+
+//
+//
+////.h file code:
+//
+//#include <string>
+//#include <vector>
+//#include <stdexcept>
+//
+//public:
+//    static long long getLongMD5(const std::wstring &str);
+//
+//private:
+//    static long long getLongOffset(std::vector<char> &array, int const offset);
+//
+////.cpp file code:
+//
+//#include "snippet.h"
+//
+//long long <missing_class_definition>::getLongMD5(const std::wstring &str)
+//{
+//    try
+//    {
+//        //            System.out.println(MD5(str));
+//        const std::vector<char> digest = MD5(str).getBytes();
+//        return (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
+//    }
+//    catch (const std::runtime_error &var2)
+//    {
+//        return -1;
+//    }
+//}
+//
+//
+//
+//long long <missing_class_definition>::getLongOffset(std::vector<char> &array, int const offset)
+//{
+//    long long value = 0;
+//    for (int i = 0; i < 8; i++)
+//    {
+//        value = ((value << 8) | (array[offset + i] & 0xFF));
+//    }
+//    return value;
+//}
+
+
+
+
+
+
+
+
 
 // Returns the md5 hash of an UTF-16 representation of a string
 static void md5_utf16(sqlite3_context *context, int argc, sqlite3_value **argv) {
@@ -436,6 +516,7 @@ static void md5file(sqlite3_context *context, int argc, sqlite3_value **argv){
 int sqlite3Md5Init(sqlite3 *db){
     sqlite3_create_function(db, "group_md5", -1, SQLITE_UTF8, 0, 0, md5step, md5finalize);
     sqlite3_create_function(db, "md5",      -1, SQLITE_UTF8,  0, md5,     0, 0);
+    sqlite3_create_function(db, "md5long",      -1, SQLITE_UTF8,  0, md5long,     0, 0);
     sqlite3_create_function(db, "md5_utf16", -1, SQLITE_UTF16, 0, md5_utf16, 0, 0);
     sqlite3_create_function(db, "md5file",   1, SQLITE_UTF8,  0, md5file, 0, 0);
     return 0;

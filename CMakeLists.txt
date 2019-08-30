@@ -7,8 +7,8 @@ include_directories(.)
 
 #set(SOURCE_FILES
 file(GLOB SOURCE_FILES
-#        main_test_sqlite.cpp
-        main_test_md5.cpp
+        main_test_sqlite.cpp
+#        main_test_md5.cpp
 #        sqlite3.h
         sqlite3.c
 #        md5.h
@@ -18,4 +18,4 @@ file(GLOB SOURCE_FILES
 
 add_executable(sqlite3_ext_md5 ${SOURCE_FILES})
 
-#add_library(sqlite3_ext_md5 SHARED ${SOURCE_FILES})
+#add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
