@@ -43,6 +43,8 @@ select hex(md5file('/tmp/agent_callbuilder.tcl'));
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
+#include <stdlib.h>
 
 #ifndef SQLITE_CORE
   #include "sqlite3ext.h"
@@ -341,18 +343,7 @@ static void md5(sqlite3_context *context, int argc, sqlite3_value **argv){
     sqlite3_result_blob(context, digest, sizeof(digest), SQLITE_TRANSIENT);
 }
 
-int md5test(int value)
-{
-    return value + 255;
-}
 
-//static char md5direct(const char str)
-//{
-//    int argc = 10;
-//    sqlite3_value **argv;
-//    **argv = (sqlite3_value**)str;
-//    return md5direct2(argc, argv);
-//}
 
 long long getLongOffset(unsigned char array[], int offset) {
     long long value = 0;
@@ -361,6 +352,25 @@ long long getLongOffset(unsigned char array[], int offset) {
     }
     return value;
 }
+
+char *bin2hex(const unsigned char *bin, size_t len)
+{
+    char   *out;
+    size_t  i;
+
+    if (bin == NULL || len == 0)
+        return NULL;
+
+    out = malloc(len*2+1);
+    for (i=0; i<len; i++) {
+        out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
+        out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+    }
+    out[len*2] = '\0';
+
+    return out;
+}
+
 
 static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     MD5Context ctx;
@@ -381,70 +391,24 @@ static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
         }
     }
     MD5Final(digest,&ctx);
-    printf("digest: %s\n", digest);
+
+    char *hex;
+    hex = bin2hex((unsigned char *)digest, strlen((char *)digest));
+    printf("bin2hex(digest): %s\n", hex);
 
     long long md5long;
-    md5long = (getLongOffset(digest, 0)); // ^ getLongOffset(digest, 8));
-    printf("(getLongOffset(digest, 0)): %d\n", md5long);
+    md5long = (getLongOffset(hex, 0) ^ getLongOffset(hex, 8));
+    printf("md5long: %lld\n", md5long);
+
+    unsigned char digest_ethalon[] = "1bc29b36f623ba82aaf6724fd3b16718";
+    long long md5long_ethalon;
+    md5long_ethalon = (getLongOffset(digest_ethalon, 0) ^ getLongOffset(digest_ethalon, 8));
+    printf("md5long_ethalon: %lld\n", md5long_ethalon);
+
 
     sqlite3_result_int64(context, md5long);
+//    sqlite3_result_blob(context, digest, sizeof(digest), SQLITE_TRANSIENT);
 }
-
-//public static long getLongMD5(final String str) {
-//    try {
-////            System.out.println(MD5(str));
-//        final byte[] digest = MD5(str).getBytes();
-//        return (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
-//    } catch (Exception var2) {
-//        return -1;
-//    }
-//}
-
-//
-//
-////.h file code:
-//
-//#include <string>
-//#include <vector>
-//#include <stdexcept>
-//
-//public:
-//    static long long getLongMD5(const std::wstring &str);
-//
-//private:
-//    static long long getLongOffset(std::vector<char> &array, int const offset);
-//
-////.cpp file code:
-//
-//#include "snippet.h"
-//
-//long long <missing_class_definition>::getLongMD5(const std::wstring &str)
-//{
-//    try
-//    {
-//        //            System.out.println(MD5(str));
-//        const std::vector<char> digest = MD5(str).getBytes();
-//        return (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
-//    }
-//    catch (const std::runtime_error &var2)
-//    {
-//        return -1;
-//    }
-//}
-//
-//
-//
-//long long <missing_class_definition>::getLongOffset(std::vector<char> &array, int const offset)
-//{
-//    long long value = 0;
-//    for (int i = 0; i < 8; i++)
-//    {
-//        value = ((value << 8) | (array[offset + i] & 0xFF));
-//    }
-//    return value;
-//}
-
-
 
 
 
