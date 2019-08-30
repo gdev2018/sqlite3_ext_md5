@@ -364,8 +364,10 @@ char *bin2hex(const unsigned char *bin, size_t len)
 
     out = malloc(len*2+1);
     for (i=0; i<len; i++) {
-        out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
-        out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+//        out[i*2]   = "0123456789ABCDEF"[bin[i] >> 4];
+//        out[i*2+1] = "0123456789ABCDEF"[bin[i] & 0x0F];
+        out[i*2]   = "0123456789abcdef"[bin[i] >> 4];
+        out[i*2+1] = "0123456789abcdef"[bin[i] & 0x0F];
     }
     out[len*2] = '\0';
 

@@ -30,13 +30,45 @@ int main(int argc, char *argv[]) {
 //    printf("md5long: %lld\n", md5long);
 //    return 0;
 
-    // test getLongOffset by char *a
-//    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
+//    // test getLongOffset by char *a
+////    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
+//    const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
+//    long long md5long;
+//    md5long = (getLongOffset((unsigned char *)a, 0) ^ getLongOffset((unsigned char *)a, 8));
+//    printf("md5long: %lld\n", md5long);
+////    return 0;
+
+    // test hex-bin-hex-getLongOffset
+
+    // 1-hex2bin
     const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
+    printf("a = %s\n", a);
+    unsigned char *bin;
+    size_t         binlen;
+    binlen = hexs2bin(a, &bin);
+    printf("bin = %.*s\n", (int)binlen, (char *)bin);
+
+    // 2-bin2hex
+    char          *hex;
+    hex = bin2hex((unsigned char *)bin, binlen);
+    printf("hex = %s\n", hex);
+    printf("binlen = %d\n", binlen);
+    printf("strlen((char *)bin)) = %d\n", strlen((char *)bin));
+
+    // 3-getLongOffset by char *hex
     long long md5long;
+    md5long = (getLongOffset((unsigned char *)hex, 0) ^ getLongOffset((unsigned char *)hex, 8));
+    printf("md5long by (unsigned char *)hex: %lld\n", md5long);
     md5long = (getLongOffset((unsigned char *)a, 0) ^ getLongOffset((unsigned char *)a, 8));
-    printf("md5long: %lld\n", md5long);
+    printf("md5long by *a: %lld\n", md5long);
+    // diff a and hex was in 0123456789abcdef or 0123456789ABCDEF in bin2hex function
+
+
+    free(hex);
+    free(bin);
     return 0;
+
+
 
 
 
