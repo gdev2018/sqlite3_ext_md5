@@ -23,14 +23,15 @@ static int callback(void *data, int argc, char **argv, char **azColName){
 }
 
 int main(int argc, char *argv[]) {
-//    // test getLongOffset by unsigned char
+//    //--------- test getLongOffset by unsigned char
 //    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
-//    long long md5long;
-//    md5long = (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
-//    printf("md5long: %lld\n", md5long);
-//    return 0;
+    unsigned char digest[] = "86ae973193b63cf8239bb7cdb3adcc13";    // returns 17 digits
+    long long md5long;
+    md5long = abs(getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
+    printf("md5long: %lld\n", md5long);
+    return 0;
 
-//    // test getLongOffset by char *a
+//    //--------- test getLongOffset by char *a
 ////    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
 //    const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
 //    long long md5long;
@@ -38,7 +39,7 @@ int main(int argc, char *argv[]) {
 //    printf("md5long: %lld\n", md5long);
 ////    return 0;
 
-//    // test hex-bin-hex-getLongOffset
+//    //--------- test hex-bin-hex-getLongOffset
 //    // 1-hex2bin
 //    const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
 //    printf("a = %s\n", a);
@@ -63,7 +64,7 @@ int main(int argc, char *argv[]) {
 //    free(bin);
 //    return 0;
 
-//    // test hex2bin
+//    //--------- test hex2bin
 //    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
 //    const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
 //    char          *hex;
@@ -83,7 +84,7 @@ int main(int argc, char *argv[]) {
 //    return 0;
 
 
-//    // test bin2hex
+//    //--------- test bin2hex
 //    const char    *a = "1bc29b36f623ba82aaf6724fd3b16718";
 //    char          *hex;
 //    unsigned char *bin;
@@ -128,6 +129,7 @@ int main(int argc, char *argv[]) {
 //    sql = "SELECT s_Step, hex(md5('md5')), hex(md5long('md5')) from t_Steps";
 //    sql = "SELECT s_Step, hex(md5('md5')), hex2long(s_Step), hex2long(lower(hex(md5('md5')))), md5long('md5') from t_Steps";
     sql = "SELECT hex2long(s_Step) from t_Steps";
+    sql = "SELECT md5long(s_Step) FROM t_Steps;";
 
     /* Execute SQL statement */
     rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
