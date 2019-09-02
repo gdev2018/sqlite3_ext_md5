@@ -126,7 +126,8 @@ int main(int argc, char *argv[]) {
     /* Create SQL statement */
 //    sql = "SELECT s_Step, median(l_id), md5long(s_Step) from t_Steps";
 //    sql = "SELECT s_Step, hex(md5('md5')), hex(md5long('md5')) from t_Steps";
-    sql = "SELECT s_Step, hex(md5('md5')), hex2long(s_Step), hex2long(lower(hex(md5('md5')))), md5long('md5') from t_Steps";
+//    sql = "SELECT s_Step, hex(md5('md5')), hex2long(s_Step), hex2long(lower(hex(md5('md5')))), md5long('md5') from t_Steps";
+    sql = "SELECT hex2long(s_Step) from t_Steps";
 
     /* Execute SQL statement */
     rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);

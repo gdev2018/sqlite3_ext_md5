@@ -354,6 +354,7 @@ long long getLongOffset(const unsigned char *hex, int offset) {
     return value;
 }
 
+// John, thanks a lot! https://nachtimwald.com/2017/09/24/hex-encode-and-decode-in-c/
 char *bin2hex(const unsigned char *bin, size_t len, int lower)
 {
     char   *out;
@@ -423,16 +424,26 @@ size_t hexs2bin(const char *hex, unsigned char **out)
 
 static void hex2long(sqlite3_context *context, int argc, sqlite3_value **argv){
     unsigned char digest[16];
-    const unsigned char *zIn;
-//    int nIn;
+    for (int i = 0; i < 16; i++) {
+        digest[i] = 0;
+    }
 
     assert( argc==1 );
     if( sqlite3_value_type(argv[0])==SQLITE_NULL ) return;
-    zIn = (const unsigned char*)sqlite3_value_text(argv[0]);
-//    nIn = sqlite3_value_bytes(argv[0]);
 
-//    assert( nIn<16 );
-    strcpy(digest, zIn);    // prevent for control size input string <16
+    const unsigned char *zIn;
+    zIn = (const unsigned char*)sqlite3_value_text(argv[0]);
+
+//    int nIn = sqlite3_value_bytes(argv[0]);
+////    assert( nIn<16 );
+//    strcpy(digest, zIn);    // prevent for control size input string <16
+//                            // error if strlen(zIn) > 16
+
+    size_t strlen_zIn = strlen(zIn);
+    if( strlen_zIn > 16 ) strlen_zIn = 16;
+    for (int i = 0; i < strlen_zIn; i++) {
+        digest[i] = zIn[i];
+    }
 
     long long md5long;
     md5long = (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));

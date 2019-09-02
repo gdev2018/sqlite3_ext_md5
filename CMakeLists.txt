@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(.)
 
-set(compile_to_lib 0)
+set(compile_to_lib 0)   # 0 - compile to exe for testing, 1 - dll
 
 if(${compile_to_lib})
     message(STATUS "compile to dll")
