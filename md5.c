@@ -448,7 +448,8 @@ static void hex2long(sqlite3_context *context, int argc, sqlite3_value **argv){
     long long md5long;
     md5long = (getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
 
-    sqlite3_result_int64(context, abs(md5long));
+    // llabs for long long type
+    sqlite3_result_int64(context, llabs(md5long));
 }
 
 static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
@@ -477,7 +478,8 @@ static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     long long md5long;
     md5long = (getLongOffset((unsigned char *)hex, 0) ^ getLongOffset((unsigned char *)hex, 8));
 
-    sqlite3_result_int64(context, abs(md5long));
+    // llabs for long long type
+    sqlite3_result_int64(context, llabs(md5long));
 }
 
 
