@@ -348,6 +348,11 @@ static void md5(sqlite3_context *context, int argc, sqlite3_value **argv){
 //long long getLongOffset(unsigned char array[], int offset) {
 long long getLongOffset(const unsigned char *hex, int offset) {
     long long value = 0;
+
+    if (hex == NULL) {
+        return value;
+    }
+
     for (int i = 0; i < 8; i++) {
         value = ((value << 8) | (hex[offset+i] & 0xFF));
     }
@@ -452,6 +457,7 @@ static void hex2long(sqlite3_context *context, int argc, sqlite3_value **argv){
     sqlite3_result_int64(context, llabs(md5long));
 }
 
+//NOTE: md5long() == hex2long(lower(hex(md5())))
 static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     MD5Context ctx;
     unsigned char digest[16];
@@ -473,7 +479,9 @@ static void md5long(sqlite3_context *context, int argc, sqlite3_value **argv){
     MD5Final(digest,&ctx);
 
     const char *hex;
-    hex = bin2hex(digest, strlen(digest), 1);
+//    hex = bin2hex(digest, strlen(digest), 1);
+    hex = bin2hex(digest, sizeof(digest), 1);
+//    hex = bin2hex(digest, 16, 1);
 
     long long md5long;
     md5long = (getLongOffset((unsigned char *)hex, 0) ^ getLongOffset((unsigned char *)hex, 8));

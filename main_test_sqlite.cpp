@@ -23,13 +23,13 @@ static int callback(void *data, int argc, char **argv, char **azColName){
 }
 
 int main(int argc, char *argv[]) {
-//    //--------- test getLongOffset by unsigned char
-//    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
-    unsigned char digest[] = "86ae973193b63cf8239bb7cdb3adcc13";    // returns 17 digits
-    long long md5long;
-    md5long = abs(getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
-    printf("md5long: %lld\n", md5long);
-    return 0;
+////    //--------- test getLongOffset by unsigned char
+////    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
+//    unsigned char digest[] = "86ae973193b63cf8239bb7cdb3adcc13";    // returns 17 digits
+//    long long md5long;
+//    md5long = abs(getLongOffset(digest, 0) ^ getLongOffset(digest, 8));
+//    printf("md5long: %lld\n", md5long);
+//    return 0;
 
 //    //--------- test getLongOffset by char *a
 ////    unsigned char digest[] = "1bc29b36f623ba82aaf6724fd3b16718";
@@ -130,6 +130,34 @@ int main(int argc, char *argv[]) {
 //    sql = "SELECT s_Step, hex(md5('md5')), hex2long(s_Step), hex2long(lower(hex(md5('md5')))), md5long('md5') from t_Steps";
     sql = "SELECT hex2long(s_Step) from t_Steps";
     sql = "SELECT md5long(s_Step) FROM t_Steps;";
+
+//    sql = "SELECT md5('55-55--2007-03-05 10:38:19.000-2007-03-05 10:41:13.000----2007-03-05 10:38:19.000--52') FROM t_Steps;";
+    sql = "SELECT md5long('55-55--2007-03-05 10:38:19.000-2007-03-05 10:41:13.000----2007-03-05 10:38:19.000--52') FROM t_Steps;";
+//    sql = "SELECT hex2long(hex(md5('55-55--2007-03-05 10:38:19.000-2007-03-05 10:41:13.000----2007-03-05 10:38:19.000--52'))) FROM t_Steps;";
+//    sql = "SELECT hex2long((md5('55-55--2007-03-05 10:38:19.000-2007-03-05 10:41:13.000----2007-03-05 10:38:19.000--52'))) FROM t_Steps;";
+
+//  NOTE: md5long() == hex2long(lower(hex(md5())))
+
+
+//    sql = "SELECT \
+//            hex2long(hex(md5( \
+//            --((md5long( \
+//            --((md5( \
+//            ifnull(l_ID, '') \
+//            ||'-'|| ifnull(l_Task, '') \
+//            ||'-'|| ifnull(s_Step, '') \
+//            ||'-'|| ifnull(dt_Start, '') \
+//            ||'-'|| ifnull(dt_Finish, '') \
+//            ||'-'|| ifnull(l_MinMinus, '') \
+//            ||'-'|| ifnull(dbl_Output, '') \
+//            ||'-'|| ifnull(l_TypeOutput, '') \
+//            ||'-'|| ifnull(dt_Generation, '') \
+//            ||'-'|| ifnull(sensitivity, '') \
+//            ||'-'|| ifnull(_id, '') \
+//            ))) \
+//            FROM     t_Steps \
+//            WHERE l_id = 55";
+
 
     /* Execute SQL statement */
     rc = sqlite3_exec(db, sql, callback, (void*)data, &zErrMsg);
